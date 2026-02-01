@@ -90,7 +90,7 @@ export function WaterBottleDashboard({
         <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Today's Hydration</h3>
         <div className="flex justify-center">
           <WaterWaveCircle
-            percentage={minDailyProgress}
+            percentage={percent}
             size={200}
             label="Minimum Target Progress"
             value={`${dailyConsumed}ml / ${minDailyGoal}ml`}
@@ -123,7 +123,7 @@ export function WaterBottleDashboard({
 
       {/* Main Stats Grid */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        {/* Current Bottle Volume (Battery-style indicator) */}
+        {/* Current Bottle Volume (Progress bar) */}
         <div className="bg-blue-50 rounded-xl p-3">
           <div className="flex items-center gap-2 mb-2">
             <Droplet className="w-4 h-4 text-blue-600" />
@@ -132,24 +132,20 @@ export function WaterBottleDashboard({
           <div className="text-xl font-bold text-blue-600">{bottleVolume}ml</div>
           <div className="text-xs text-gray-500">/ {bottleCapacity}ml</div>
 
-          <div className="mt-3 flex items-center justify-center">
-            <div className={`relative w-40 h-20 rounded-lg bg-transparent`}>
-              {/* Battery tip */}
-              <div className={`absolute -right-1.5 top-1/2 -translate-y-1/2 w-1.5 h-8 rounded-r ${tipClass}`} />
-
-              {/* Water fill */}
-              <div className="absolute inset-0 rounded overflow-hidden">
-                <div
-                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t ${fillGradient} transition-all duration-500`}
-                  style={{ height: `${Math.min(100, Math.max(0, percent))}%` }}
-                />
+          <div className="mt-3">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <div className="h-3 bg-white rounded-full overflow-hidden border border-gray-200">
+                  <div
+                      className={`h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-500`}
+                      style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+                    />
+                </div>
               </div>
-
-              {/* Percentage text removed as requested */}
+              <div className="w-12 text-sm font-semibold text-gray-700 text-right">{percent}%</div>
             </div>
           </div>
         </div>
-        
 
         {/* Daily Progress */}
         <div className="bg-green-50 rounded-xl p-3">
@@ -160,7 +156,20 @@ export function WaterBottleDashboard({
           <div className="text-xl font-bold text-green-600">{dailyConsumed}ml</div>
           <div className="text-xs text-gray-500">Min: {minDailyGoal}ml</div>
         </div>
-        {/* Temperature Card */}
+
+        {/* Time Since Last Drink (left of Water Temp) */}
+        <div className={`${alertActive ? 'bg-red-50' : 'bg-purple-50'} rounded-xl p-3`}>
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className={`w-4 h-4 ${alertActive ? 'text-red-600' : 'text-purple-600'}`} />
+            <span className="text-xs text-gray-600">Last Drink</span>
+          </div>
+          <div className={`text-xl font-bold ${alertActive ? 'text-red-600' : 'text-purple-600'}`}>
+            {minutesSinceLastDrink} minutes ago
+          </div>
+          {alertActive && <div className="text-xs text-red-600 mt-1">⚠️ Time to hydrate!</div>}
+        </div>
+
+        {/* Temperature Card (to the right of Last Drink) */}
         <div className={`rounded-xl p-3 ${tempBgClass}`}>
           <div className="flex items-center gap-2 mb-2">
             <Thermometer className={`w-4 h-4 ${tempColor}`} />
@@ -170,17 +179,6 @@ export function WaterBottleDashboard({
             <span className={`${tempColor}`}>{temp}°C</span>
           </div>
           <div className="text-xs text-gray-500">{tempLabel}</div>
-  </div>
-        {/* Time Since Last Drink */}
-        <div className={`${alertActive ? 'bg-red-50' : 'bg-purple-50'} rounded-xl p-3 col-span-2`}>
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className={`w-4 h-4 ${alertActive ? 'text-red-600' : 'text-purple-600'}`} />
-            <span className="text-xs text-gray-600">Last Drink</span>
-          </div>
-          <div className={`text-xl font-bold ${alertActive ? 'text-red-600' : 'text-purple-600'}`}>
-            {minutesSinceLastDrink} minutes ago
-          </div>
-          {alertActive && <div className="text-xs text-red-600 mt-1">⚠️ Time to hydrate!</div>}
         </div>
       </div>
 
