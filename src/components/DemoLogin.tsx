@@ -15,7 +15,7 @@ export function DemoLogin({ medicalHistory, onMedicalHistoryChange, kidneyStoneT
   const stoneTypes: { id: KidneyStoneType; name: string; emoji: string }[] = [
     { id: 'calcium-oxalate', name: 'Calcium Oxalate', emoji: '🟡' },
     { id: 'calcium-phosphate', name: 'Calcium Phosphate', emoji: '⚪' },
-  { id: 'uric-acid', name: 'Uric Acid', emoji: '🔴' },
+    { id: 'uric-acid', name: 'Uric Acid', emoji: '🔴' },
     { id: 'other', name: 'Other / Unknown', emoji: '❓' },
   ];
 

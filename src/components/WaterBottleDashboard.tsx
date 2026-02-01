@@ -1,4 +1,4 @@
-import { Droplet, TrendingUp, Clock } from 'lucide-react';
+import { Droplet, TrendingUp, Clock, Battery, Thermometer } from 'lucide-react';
 import { WaterWaveCircle } from './WaterWaveCircle';
 
 interface WaterBottleDashboardProps {
@@ -8,6 +8,7 @@ interface WaterBottleDashboardProps {
   maxDailyGoal: number;
   dailyConsumed: number;
   lastDrinkTime: Date;
+  waterTemperature: number;
   alertActive: boolean;
   onSimulateDrink: (volume: number) => void;
   onRefill: () => void;
@@ -24,6 +25,7 @@ export function WaterBottleDashboard({
   maxDailyGoal,
   dailyConsumed,
   lastDrinkTime,
+  waterTemperature,
   alertActive,
   onSimulateDrink,
   onRefill,
@@ -35,16 +37,50 @@ export function WaterBottleDashboard({
   const minDailyProgress = (dailyConsumed / minDailyGoal) * 100;
   const maxDailyProgress = (dailyConsumed / maxDailyGoal) * 100;
   const minutesSinceLastDrink = Math.floor((Date.now() - lastDrinkTime.getTime()) / 60000);
+  const percent = Math.round((bottleVolume / bottleCapacity) * 100);
+  const fillGradient = percent >= 60 ? 'from-green-400 to-green-600' : percent >= 20 ? 'from-yellow-400 to-orange-400' : 'from-red-500 to-red-600';
+  const iconColorClass = percent >= 60 ? 'text-green-600' : percent >= 20 ? 'text-orange-500' : 'text-red-600';
+  const tipClass = percent > 0 ? (percent >= 60 ? 'bg-green-600' : percent >= 20 ? 'bg-orange-400' : 'bg-red-600') : 'bg-gray-300';
+  const borderClass = percent >= 60 ? 'border-transparent' : 'border-gray-300';
+  const percentTextClass = percent === 60 ? 'text-black' : percent > 60 ? 'text-white' : 'text-gray-800';
+
+  // Temperature display helpers
+  const temp = (waterTemperature ?? 22);
+  const tempLabel = temp >= 35 ? 'Hot' : temp >= 20 ? 'Warm' : temp >= 10 ? 'Cool' : 'Cold';
+  const tempColor = temp >= 35 ? 'text-red-600' : temp >= 20 ? 'text-orange-500' : temp >= 10 ? 'text-cyan-600' : 'text-blue-600';
+  const tempBgClass = temp >= 35 ? 'bg-red-50 border border-red-200' : temp >= 20 ? 'bg-orange-50 border border-orange-200' : temp >= 10 ? 'bg-cyan-50 border border-cyan-200' : 'bg-blue-50 border border-blue-200';
 
   return (
     <div className="h-full p-4 overflow-y-auto">
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">Dashboard</h2>
       
-      {/* Bluetooth Connection Status */}
+      {/* Bluetooth Connection Status (with compact battery display) */}
       <div className="mb-4 bg-blue-50 rounded-xl p-3 border border-blue-200">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-          <span className="text-sm text-blue-700">Bottle connected via Bluetooth</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+            <span className="text-sm text-blue-700">Bottle connected via Bluetooth</span>
+          </div>
+
+          {/* Compact battery-style indicator using bottle volume as proxy */}
+          <div className="flex items-center gap-3">
+            <Battery className={`w-5 h-5 ${iconColorClass}`} />
+            <div className={`relative w-20 h-6 bg-transparent ${borderClass} rounded-lg flex items-center px-1`}>
+              {/* tip */}
+              <div className={`absolute -right-2 top-1/2 -translate-y-1/2 w-2 h-3 rounded-r ${tipClass}`} />
+              <div className="w-full h-full rounded overflow-hidden bg-transparent">
+                <div
+                  className={`h-full bg-gradient-to-r ${fillGradient} transition-all`}
+                  style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+                />
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span className={`text-xs font-semibold ${percentTextClass}`}>
+                  {percent}%
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
         <p className="text-xs text-blue-600 mt-1">Water data synced automatically</p>
       </div>
@@ -87,7 +123,7 @@ export function WaterBottleDashboard({
 
       {/* Main Stats Grid */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        {/* Current Bottle Volume */}
+        {/* Current Bottle Volume (Battery-style indicator) */}
         <div className="bg-blue-50 rounded-xl p-3">
           <div className="flex items-center gap-2 mb-2">
             <Droplet className="w-4 h-4 text-blue-600" />
@@ -95,7 +131,25 @@ export function WaterBottleDashboard({
           </div>
           <div className="text-xl font-bold text-blue-600">{bottleVolume}ml</div>
           <div className="text-xs text-gray-500">/ {bottleCapacity}ml</div>
+
+          <div className="mt-3 flex items-center justify-center">
+            <div className={`relative w-40 h-20 rounded-lg bg-transparent`}>
+              {/* Battery tip */}
+              <div className={`absolute -right-1.5 top-1/2 -translate-y-1/2 w-1.5 h-8 rounded-r ${tipClass}`} />
+
+              {/* Water fill */}
+              <div className="absolute inset-0 rounded overflow-hidden">
+                <div
+                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t ${fillGradient} transition-all duration-500`}
+                  style={{ height: `${Math.min(100, Math.max(0, percent))}%` }}
+                />
+              </div>
+
+              {/* Percentage text removed as requested */}
+            </div>
+          </div>
         </div>
+        
 
         {/* Daily Progress */}
         <div className="bg-green-50 rounded-xl p-3">
@@ -106,7 +160,17 @@ export function WaterBottleDashboard({
           <div className="text-xl font-bold text-green-600">{dailyConsumed}ml</div>
           <div className="text-xs text-gray-500">Min: {minDailyGoal}ml</div>
         </div>
-
+        {/* Temperature Card */}
+        <div className={`rounded-xl p-3 ${tempBgClass}`}>
+          <div className="flex items-center gap-2 mb-2">
+            <Thermometer className={`w-4 h-4 ${tempColor}`} />
+            <span className="text-xs text-gray-600">Water Temp</span>
+          </div>
+          <div className="text-2xl font-bold">
+            <span className={`${tempColor}`}>{temp}°C</span>
+          </div>
+          <div className="text-xs text-gray-500">{tempLabel}</div>
+  </div>
         {/* Time Since Last Drink */}
         <div className={`${alertActive ? 'bg-red-50' : 'bg-purple-50'} rounded-xl p-3 col-span-2`}>
           <div className="flex items-center gap-2 mb-2">

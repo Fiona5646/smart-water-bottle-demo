@@ -18,6 +18,7 @@ export default function App() {
   const [dailyConsumed, setDailyConsumed] = useState(550); // ml
   const [lastDrinkTime, setLastDrinkTime] = useState<Date>(new Date());
   const [alertActive, setAlertActive] = useState(false);
+  const [waterTemperature, setWaterTemperature] = useState<number>(22); // Celsius (demo)
   const [kidneyStoneType, setKidneyStoneType] = useState<KidneyStoneType>(null);
   const [medicalHistory, setMedicalHistory] = useState<string>('');
   const [hydrationFrequencyMinutes, setHydrationFrequencyMinutes] = useState<number>(30);
@@ -41,7 +42,7 @@ export default function App() {
     }, 60000); // Check every minute
 
     return () => clearInterval(checkInterval);
-  }, [lastDrinkTime]);
+  }, [lastDrinkTime, hydrationFrequencyMinutes]);
 
   // Simulate Bluetooth data updates
   const simulateDrink = (volume: number) => {
@@ -90,6 +91,7 @@ export default function App() {
               maxDailyGoal={maxDailyGoal}
               dailyConsumed={dailyConsumed}
               lastDrinkTime={lastDrinkTime}
+              waterTemperature={waterTemperature}
               alertActive={alertActive}
               onSimulateDrink={simulateDrink}
               onRefill={refillBottle}
