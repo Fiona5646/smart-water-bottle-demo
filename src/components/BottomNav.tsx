@@ -1,6 +1,6 @@
-import { Droplet, LayoutDashboard, History, Bell, Info } from 'lucide-react';
+import { Droplet, LayoutDashboard, History, Bell, Info, User } from 'lucide-react';
 
-type Screen = 'bottle' | 'dashboard' | 'history' | 'reminders' | 'info';
+type Screen = 'bottle' | 'dashboard' | 'history' | 'reminders' | 'info' | 'login';
 
 interface BottomNavProps {
   activeScreen: Screen;
@@ -9,11 +9,11 @@ interface BottomNavProps {
 
 export function BottomNav({ activeScreen, onScreenChange }: BottomNavProps) {
   const navItems = [
-    { id: 'bottle' as Screen, icon: Droplet, label: 'Bottle' },
     { id: 'dashboard' as Screen, icon: LayoutDashboard, label: 'Dashboard' },
-    { id: 'history' as Screen, icon: History, label: 'History' },
+  { id: 'history' as Screen, icon: History, label: 'History' },
     { id: 'reminders' as Screen, icon: Bell, label: 'Reminders' },
-    { id: 'info' as Screen, icon: Info, label: 'Info' }
+  { id: 'info' as Screen, icon: Info, label: 'Info' },
+  { id: 'login' as Screen, icon: User, label: 'Login' }
   ];
 
   return (

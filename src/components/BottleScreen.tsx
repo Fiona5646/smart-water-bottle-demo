@@ -30,7 +30,7 @@ export function BottleScreen({
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-gray-900 to-gray-800 p-6 text-white relative overflow-hidden">
+    <div className="h-full bg-gray-900 p-6 text-white relative overflow-hidden">
       {/* Alert glow effect */}
       {alertActive && (
         <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse pointer-events-none" />

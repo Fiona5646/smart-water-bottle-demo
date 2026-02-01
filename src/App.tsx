@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { WaterBottleDashboard } from './components/WaterBottleDashboard';
-import { BottleScreen } from './components/BottleScreen';
 import { ReminderManager } from './components/ReminderManager';
 import { DrinkingHistory } from './components/DrinkingHistory';
 import { InfoPage } from './components/InfoPage';
 import { BottomNav } from './components/BottomNav';
+import { DemoLogin } from './components/DemoLogin';
 
-type Screen = 'bottle' | 'dashboard' | 'history' | 'reminders' | 'info';
-type KidneyStoneType = 'calcium-oxalate' | 'calcium-phosphate' | 'uric-acid' | 'struvite' | 'other' | null;
+type Screen = 'dashboard' | 'history' | 'reminders' | 'info' | 'login';
+type KidneyStoneType = 'calcium-oxalate' | 'calcium-phosphate' | 'uric-acid' | 'other' | null;
 
 export default function App() {
-  const [activeScreen, setActiveScreen] = useState<Screen>('bottle');
+  const [activeScreen, setActiveScreen] = useState<Screen>('dashboard');
   const [bottleVolume, setBottleVolume] = useState(450); // ml - from Bluetooth
   const [bottleCapacity] = useState(750); // ml - fixed capacity
   const [minDailyGoal, setMinDailyGoal] = useState(2000); // ml - minimum target
@@ -19,6 +19,8 @@ export default function App() {
   const [lastDrinkTime, setLastDrinkTime] = useState<Date>(new Date());
   const [alertActive, setAlertActive] = useState(false);
   const [kidneyStoneType, setKidneyStoneType] = useState<KidneyStoneType>(null);
+  const [medicalHistory, setMedicalHistory] = useState<string>('');
+  const [hydrationFrequencyMinutes, setHydrationFrequencyMinutes] = useState<number>(30);
 
   const [reminders, setReminders] = useState<Array<{ id: string; text: string; time: string }>>([
     { id: '1', text: 'Morning medication', time: '08:00' },
@@ -35,7 +37,7 @@ export default function App() {
   useEffect(() => {
     const checkInterval = setInterval(() => {
       const minutesSinceLastDrink = Math.floor((Date.now() - lastDrinkTime.getTime()) / 60000);
-      setAlertActive(minutesSinceLastDrink >= 30);
+      setAlertActive(minutesSinceLastDrink >= hydrationFrequencyMinutes);
     }, 60000); // Check every minute
 
     return () => clearInterval(checkInterval);
@@ -79,17 +81,6 @@ export default function App() {
         
         {/* Screen Content */}
         <div className="flex-1 overflow-y-auto pt-8 pb-20">
-          {activeScreen === 'bottle' && (
-            <BottleScreen
-              bottleVolume={bottleVolume}
-              bottleCapacity={bottleCapacity}
-              dailyConsumed={dailyConsumed}
-              minDailyGoal={minDailyGoal}
-              maxDailyGoal={maxDailyGoal}
-              alertActive={alertActive}
-              reminders={reminders}
-            />
-          )}
           
           {activeScreen === 'dashboard' && (
             <WaterBottleDashboard
@@ -104,6 +95,8 @@ export default function App() {
               onRefill={refillBottle}
               onMinDailyGoalChange={setMinDailyGoal}
               onMaxDailyGoalChange={setMaxDailyGoal}
+              hydrationFrequencyMinutes={hydrationFrequencyMinutes}
+              onHydrationFrequencyChange={setHydrationFrequencyMinutes}
             />
           )}
           
@@ -125,6 +118,15 @@ export default function App() {
 
           {activeScreen === 'info' && (
             <InfoPage
+              kidneyStoneType={kidneyStoneType}
+              onKidneyStoneTypeChange={setKidneyStoneType}
+            />
+          )}
+
+          {activeScreen === 'login' && (
+            <DemoLogin
+              medicalHistory={medicalHistory}
+              onMedicalHistoryChange={setMedicalHistory}
               kidneyStoneType={kidneyStoneType}
               onKidneyStoneTypeChange={setKidneyStoneType}
             />

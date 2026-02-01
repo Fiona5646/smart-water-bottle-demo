@@ -13,6 +13,8 @@ interface WaterBottleDashboardProps {
   onRefill: () => void;
   onMinDailyGoalChange: (goal: number) => void;
   onMaxDailyGoalChange: (goal: number) => void;
+  hydrationFrequencyMinutes?: number;
+  onHydrationFrequencyChange?: (m: number) => void;
 }
 
 export function WaterBottleDashboard({
@@ -27,6 +29,8 @@ export function WaterBottleDashboard({
   onRefill,
   onMinDailyGoalChange,
   onMaxDailyGoalChange,
+  hydrationFrequencyMinutes,
+  onHydrationFrequencyChange,
 }: WaterBottleDashboardProps) {
   const minDailyProgress = (dailyConsumed / minDailyGoal) * 100;
   const maxDailyProgress = (dailyConsumed / maxDailyGoal) * 100;
@@ -178,6 +182,22 @@ export function WaterBottleDashboard({
 
         <div className="mt-3 text-xs text-gray-600 bg-gray-50 rounded-lg p-2">
           <strong>Note:</strong> Maximum limit prevents excessive water intake. Daily consumption cannot exceed this amount.
+        </div>
+      </div>
+
+      {/* Hydration Frequency Setting */}
+      <div className="mb-4 bg-white rounded-xl p-4 border border-gray-200">
+        <h3 className="text-sm font-semibold text-gray-800 mb-3">Hydration Reminder Frequency</h3>
+        <div className="flex items-center gap-3">
+          <input
+            type="number"
+            min={5}
+            max={240}
+            value={hydrationFrequencyMinutes ?? 30}
+            onChange={(e) => onHydrationFrequencyChange && onHydrationFrequencyChange(Number(e.target.value))}
+            className="w-24 px-3 py-2 border rounded-lg text-sm"
+          />
+          <div className="text-sm text-gray-600">minutes since last drink to trigger reminder</div>
         </div>
       </div>
 

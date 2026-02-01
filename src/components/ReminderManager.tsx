@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Plus, Trash2, Bell } from 'lucide-react';
 
 interface Reminder {
-  id: number;
+  id: string;
   text: string;
   time: string;
-  active: boolean;
+  active?: boolean;
 }
 
 interface ReminderManagerProps {
   reminders: Reminder[];
   onAddReminder: (text: string, time: string) => void;
-  onDeleteReminder: (id: number) => void;
+  onDeleteReminder: (id: string) => void;
 }
 
 export function ReminderManager({
