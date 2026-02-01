@@ -38,11 +38,15 @@ export function WaterBottleDashboard({
   const maxDailyProgress = (dailyConsumed / maxDailyGoal) * 100;
   const minutesSinceLastDrink = Math.floor((Date.now() - lastDrinkTime.getTime()) / 60000);
   const percent = Math.round((bottleVolume / bottleCapacity) * 100);
-  const fillGradient = percent >= 60 ? 'from-green-400 to-green-600' : percent >= 20 ? 'from-yellow-400 to-orange-400' : 'from-red-500 to-red-600';
+  // Battery color logic: keep percent text black when percent >= 60; show orange/red fill/icon when low (<60)
+  const fillGradient = percent >= 60 ? 'from-cyan-400 to-blue-500' : percent >= 20 ? 'from-yellow-400 to-orange-400' : 'from-red-500 to-red-600';
+  // icon color values (use inline style to avoid tailwind purge/class issues)
   const iconColorClass = percent >= 60 ? 'text-green-600' : percent >= 20 ? 'text-orange-500' : 'text-red-600';
-  const tipClass = percent > 0 ? (percent >= 60 ? 'bg-green-600' : percent >= 20 ? 'bg-orange-400' : 'bg-red-600') : 'bg-gray-300';
+  const iconColorStyle = percent >= 60 ? '#16a34a' : percent >= 20 ? '#f97316' : '#ef4444';
+  const tipClass = percent > 0 ? (percent >= 60 ? 'bg-cyan-600' : percent >= 20 ? 'bg-orange-400' : 'bg-red-600') : 'bg-gray-300';
   const borderClass = percent >= 60 ? 'border-transparent' : 'border-gray-300';
-  const percentTextClass = percent === 60 ? 'text-black' : percent > 60 ? 'text-white' : 'text-gray-800';
+  // Keep the percent text consistently black for readability; icon/fill reflect level
+  const percentTextClass = 'text-black';
 
   // Temperature display helpers
   const temp = (waterTemperature ?? 22);
@@ -64,21 +68,17 @@ export function WaterBottleDashboard({
 
           {/* Compact battery-style indicator using bottle volume as proxy */}
           <div className="flex items-center gap-3">
-            <Battery className={`w-5 h-5 ${iconColorClass}`} />
-            <div className={`relative w-20 h-6 bg-transparent ${borderClass} rounded-lg flex items-center px-1`}>
-              {/* tip */}
-              <div className={`absolute -right-2 top-1/2 -translate-y-1/2 w-2 h-3 rounded-r ${tipClass}`} />
+            <div className={`relative w-28 h-6 bg-transparent ${borderClass} rounded-lg flex items-center px-1`}>
               <div className="w-full h-full rounded overflow-hidden bg-transparent">
                 <div
                   className={`h-full bg-gradient-to-r ${fillGradient} transition-all`}
                   style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
                 />
               </div>
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className={`text-xs font-semibold ${percentTextClass}`}>
-                  {percent}%
-                </span>
-              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Battery className="w-5 h-5" style={{ color: iconColorStyle }} />
+              <span className={`text-xs font-semibold ${percentTextClass}`}>{percent}%</span>
             </div>
           </div>
         </div>
@@ -90,9 +90,9 @@ export function WaterBottleDashboard({
         <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Today's Hydration</h3>
         <div className="flex justify-center">
           <WaterWaveCircle
-            percentage={percent}
+            percentage={Math.min(100, Math.max(0, minDailyProgress))}
             size={200}
-            label="Minimum Target Progress"
+            label="Hydration Progress"
             value={`${dailyConsumed}ml / ${minDailyGoal}ml`}
             target={`Max limit: ${maxDailyGoal}ml`}
           />
@@ -137,12 +137,14 @@ export function WaterBottleDashboard({
               <div className="flex-1">
                 <div className="h-3 bg-white rounded-full overflow-hidden border border-gray-200">
                   <div
-                      className={`h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-500`}
-                      style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
-                    />
+                    className={`h-full bg-gradient-to-r ${fillGradient} transition-all duration-500`}
+                    style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+                  />
                 </div>
               </div>
-              <div className="w-12 text-sm font-semibold text-gray-700 text-right">{percent}%</div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-semibold ${percentTextClass}`}>{percent}%</span>
+              </div>
             </div>
           </div>
         </div>

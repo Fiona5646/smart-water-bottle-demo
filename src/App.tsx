@@ -11,7 +11,7 @@ type KidneyStoneType = 'calcium-oxalate' | 'calcium-phosphate' | 'uric-acid' | '
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>('dashboard');
-  const [bottleVolume, setBottleVolume] = useState(188); // ml - from Bluetooth (default 25% of capacity)
+  const [bottleVolume, setBottleVolume] = useState(450); // ml - from Bluetooth
   const [bottleCapacity] = useState(750); // ml - fixed capacity
   const [minDailyGoal, setMinDailyGoal] = useState(2000); // ml - minimum target
   const [maxDailyGoal, setMaxDailyGoal] = useState(3500); // ml - maximum target
