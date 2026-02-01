@@ -1,4 +1,13 @@
 import { Activity, Droplet, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from 'recharts';
 
 interface DrinkingHistoryProps {
   drinkingLog: Array<{ time: Date; volume: number }>;
@@ -12,7 +21,7 @@ export function DrinkingHistory({ drinkingLog, minDailyGoal, maxDailyGoal }: Dri
   const avgVolume = drinkingLog.length > 0 ? Math.round(totalVolume / drinkingLog.length) : 0;
   
   // Calculate intervals between drinks
-  const intervals = [];
+  const intervals: number[] = [];
   for (let i = 0; i < drinkingLog.length - 1; i++) {
     const diff = (drinkingLog[i].time.getTime() - drinkingLog[i + 1].time.getTime()) / (1000 * 60);
     intervals.push(Math.round(diff));
@@ -39,6 +48,24 @@ export function DrinkingHistory({ drinkingLog, minDailyGoal, maxDailyGoal }: Dri
       minute: '2-digit' 
     });
   };
+
+  // Build hourly aggregation for the last 12 hours
+  const buildHourlyData = () => {
+    const now = new Date();
+    const hours = Array.from({ length: 12 }).map((_, i) => {
+      const d = new Date(now.getTime() - (11 - i) * 60 * 60 * 1000);
+      const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), 0, 0, 0);
+      const end = new Date(start.getTime() + 60 * 60 * 1000);
+      const label = `${start.getHours().toString().padStart(2, '0')}:00`;
+      const volume = drinkingLog
+        .filter(r => r.time >= start && r.time < end)
+        .reduce((sum, r) => sum + r.volume, 0);
+      return { hour: label, volume };
+    });
+    return hours;
+  };
+
+  const hourlyData = buildHourlyData();
 
   return (
     <div className="h-full p-4 overflow-y-auto">
@@ -73,6 +100,22 @@ export function DrinkingHistory({ drinkingLog, minDailyGoal, maxDailyGoal }: Dri
             <Clock className="w-3 h-3" />
             {avgInterval}min
           </div>
+        </div>
+      </div>
+
+      {/* Hourly intake chart (last 12 hours) */}
+      <div className="mb-4">
+        <h3 className="text-sm font-semibold text-gray-700 mb-2">Intake per Hour (last 12 hours)</h3>
+        <div style={{ width: '100%', height: 160 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={hourlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="hour" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip formatter={(value: number) => `${value} ml`} />
+              <Bar dataKey="volume" fill="#60a5fa" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
