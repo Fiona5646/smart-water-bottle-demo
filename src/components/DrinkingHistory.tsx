@@ -37,15 +37,16 @@ export function DrinkingHistory({ drinkingLog, minDailyGoal, maxDailyGoal }: Dri
   const maxVolume = volumes.length > 0 ? Math.max(...volumes) : 0;
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
   const formatDateTime = (date: Date) => {
-    return date.toLocaleString('zh-CN', { 
-      month: 'short', 
+    return date.toLocaleString('en-US', {
+      month: 'short',
       day: 'numeric',
-      hour: '2-digit', 
-      minute: '2-digit' 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
